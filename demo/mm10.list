@@ -1,10 +1,7 @@
-#This is a sample file distributed with Galaxy that is used by the
-#MutSpec-Annot tools. The mm10_listAVDB.txt has this format (white space 
-#characters are TAB characters):
+#This is a sample file distributed with mutspec_annot tool.
+#Field separators are TAB characters.
 #
 #<RefGenome_DatabaseName>	<operation>
-#
-# 
 #
 mm10_refGene.txt	g
 mm10_knownGene.txt	g
@@ -13,5 +10,4 @@ mm10_cytoBand.txt	r
 mm10_genomicSuperDups.txt	r
 #mm10_snp137.txt	f
 mm10_snp142.txt	f
-toto	f
 
