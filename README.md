@@ -1,8 +1,8 @@
-# strelka2-nf
-### Strelka v2 pipeline with Nextflow
+# mutspec_annot-nf
+### mutspec_annot pipeline with Nextflow
 
 #### Dependencies
-1. Install [Strelka v2](https://github.com/Illumina/strelka).
+1. Install [annovar](http://annovar.openbioinformatics.org/en/latest/user-guide/download/).
 2. Install [nextflow](http://www.nextflow.io/).
 
 	```bash
