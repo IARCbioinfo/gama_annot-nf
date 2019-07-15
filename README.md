@@ -36,7 +36,7 @@ nextflow run iarcbioinfo/mutspec_annot.nf --help
 This shows details about optional and mandatory parameters provided by the user.  
 
 #### annovarDblist  .txt format
-The annovarDBlist file is where you can define annotations. The annovarDBlist file is where you can define annotations. See example mm10.list(https://github.com/IARCbioinfo/mutspec_annot/bin/mm10.list) in demo folder.
+The annovarDBlist file is where you can define annotations. The annovarDBlist file is where you can define annotations. See example [mm10.list](https://github.com/IARCbioinfo/mutspec_annot/bin/mm10.list) in demo folder.
 
 
 #### Global parameters
