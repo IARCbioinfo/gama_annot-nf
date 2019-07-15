@@ -36,20 +36,8 @@ nextflow run iarcbioinfo/mutspec_annot.nf --help
 This shows details about optional and mandatory parameters provided by the user.  
 
 #### annovarDblist  .txt format
-The annovarDBlist file is where you can define annotations. It's a tabular file with 2 columns normal and tumor.
+The annovarDBlist file is where you can define annotations. The annovarDBlist file is where you can define annotations. See example mm10.list(https://github.com/IARCbioinfo/mutspec_annot/bin/mm10.list) in demo folder.
 
-`#This is a sample file distributed with Galaxy that is used by the
- #MutSpec-Annot tools. The mm10_listAVDB.txt has this format (white space 
- #characters are TAB characters):
- #
- #<RefGenome_DatabaseName>       <operation>
- #
- mm10_refGene.txt		g
- mm10_knownGene.txt		g
- mm10_ensGene.txt		g
- mm10_cytoBand.txt		r
- mm10_genomicSuperDups.txt	r
- mm10_snp142.txt		f`
 
 #### Global parameters
 ```--annovarBinPath``` is mandatory parameters but can be defined in your nextflow config file (```~/.nextflow/config``` or ```config``` in the working directory) and so not set as inputs.
