@@ -16,35 +16,43 @@
 #### Execution
 
 mode somatic
-`nextflow run iarcbioinfo/strelka2.nf --mode somatic --ref hg38.fa --tn_pairs pairs.txt --input_folder path/to/bam/ --strelka path/to/strelka/`
-
-mode germline
-`nextflow run iarcbioinfo/strelka2.nf --mode germline --ref hg38.fa --input_folder path/to/bam/ --strelka path/to/strelka/`
+ `nextflow run iarcbioinfo/mutspec-annot.nf --input vcf_folder/ --annovarDBlist Dblist.txt --annovarDBpath /data/annnovar/hg38db/`
 
 #### Options
---rna
---exome
---callRegions
---outputCallableRegions
+--input 	        FOLDER	Folder containing vcf to process.
+--annovarDBlist		FILE	File with two columns : protocols and operations (see example below).
+--extention		TXT	input files extension
+--annovarDBpath		PATH	Path to annovarDB.
+--annovarBinPath	PATH	Path to table_annovar.pl.
+--thread 		INT	Number of thread for table_annovar.pl.
+--vaf				Add columns with VAF and coverage.
+
 
 #### Help section
 You can print the help manual by providing `--help` in the execution command line:
 ```bash
-nextflow run iarcbioinfo/strelka2.nf --help
+nextflow run iarcbioinfo/mutspec_annot.nf --help
 ```
 This shows details about optional and mandatory parameters provided by the user.  
 
-#### pairs.txt format
-The pairs.txt file is where you can define pairs of bam to analyse with strelka. It's a tabular file with 2 columns normal and tumor.
+#### annovarDblist  .txt format
+The annovarDBlist file is where you can define annotations. It's a tabular file with 2 columns normal and tumor.
 
-| normal | tumor |
-| ----------- | ---------- |
-| normal1.bam | tumor2.bam |
-| normal2.bam | tumor2.bam |
-| normal3.bam | tumor3.bam |
+`#This is a sample file distributed with Galaxy that is used by the
+ #MutSpec-Annot tools. The mm10_listAVDB.txt has this format (white space 
+ #characters are TAB characters):
+ #
+ #<RefGenome_DatabaseName>       <operation>
+ #
+ mm10_refGene.txt		g
+ mm10_knownGene.txt		g
+ mm10_ensGene.txt		g
+ mm10_cytoBand.txt		r
+ mm10_genomicSuperDups.txt	r
+ mm10_snp142.txt		f`
 
 #### Global parameters
-```--strelka``` and ```--ref``` are mandatory parameters but can be defined in your nextflow config file (```~/.nextflow/config``` or ```config``` in the working directory) and so not set as inputs.
+```--annovarBinPath``` is mandatory parameters but can be defined in your nextflow config file (```~/.nextflow/config``` or ```config``` in the working directory) and so not set as inputs.
 
 The following is an example of config part defining this:
 ```bash
@@ -52,8 +60,7 @@ profiles {
 
         standard {
                 params {
-                   ref = '~/Documents/Data/references/hg38.fasta'
-                   strelka = '~/bin/strelka/1.0.15/bin/'
+                   annovarBinPath = '/data/annovar/bin/'
                 }
         }
 ```

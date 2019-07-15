@@ -24,7 +24,7 @@ if (params.help) {
     log.info ''
     log.info 'Optional arguments:'
     log.info ''
-    log.info '    --extention        STRING            input file extension'
+    log.info '    --extention        STRING            input files extension'
     log.info '    --annovarDBpath    PATH              Path to annovarDB.'
     log.info '    --annovarBinPath   PATH              Path to table_annovar.pl.'
     log.info '    --output           FOLDER            Output Folder name.'
@@ -32,7 +32,7 @@ if (params.help) {
     log.info ''   
     log.info 'Flags'
     log.info ''
-    log.info '   --vaf                                 Additional columns with VAF and coverage.'
+    log.info '   --vaf                                 Add columns with VAF and coverage.'
     log.info '   --help                                Display this message.'
     exit 1
 }
