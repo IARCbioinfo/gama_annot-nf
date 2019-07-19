@@ -7,6 +7,7 @@ params.annovarBinPath = "~/bin/"
 params.output = "mutspec_annotation"
 params.thread = 1
 params.VAF = true
+params.caller = "strelka2"
 
 if (params.help) {
     log.info ''
@@ -29,6 +30,7 @@ if (params.help) {
     log.info '    --annovarBinPath   PATH              Path to table_annovar.pl.'
     log.info '    --output           FOLDER            Output Folder name.'
     log.info '    --thread           INTEGER           Number of thread for table_annovar.pl.'
+    log.info '    --caller           PATH              Software used for calling (strelka2, mutect2 or haplotypecaller)'
     log.info ''   
     log.info 'Flags'
     log.info ''
@@ -83,7 +85,7 @@ if (params.VAF){
 
     shell:
     '''
-    getAllelicFraction.r
+    getAllelicFraction.r -c !{params.caller}
     '''
   }
 
