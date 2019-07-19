@@ -1,15 +1,23 @@
 #!/usr/bin/env Rscript
 library(data.table)
+caller="strelka2"
+suppressPackageStartupMessages(library(GetoptLong))
+GetoptLong(matrix(c( "caller|c=s", "caller=c(strelka2,mutect2,haplotypecaller)"	), ncol=2, byrow=TRUE))
 
-somatic<-list.files(pattern="*somatic.snvs.fix.tab$")
-germline<-list.files(pattern="*germline.fix.tab$")
+somatic<-list.files(pattern="*somatic.snvs.tab$")
+germline<-list.files(pattern="*germline.tab$")
 mutect2<-list.files(pattern="*calls.tab$")
+haplotypecaller<-list.files(pattern="*.tab$")
+
+if (! caller %in% c("strelka2","mutect2","haplotypecaller") ){ stop( paste0("sorry, ", caller,  " is not suported, you cannot use --VAF option") )  }
 
 #strelka germline
+if (caller=="strelka2"){
+
 print("strelka germline")
 for (file in germline){
 
-#TODO : rewrite this part
+	#TODO : rewrite this part
 	print(file)
 
 	vcf<-fread(file)
@@ -106,14 +114,17 @@ for (file in somatic){
 	write.table(tab, file=filename , sep="\t", row.names=F, quote=F)
 }
 
+}
 
 #Mutect2
+if( caller=="mutect2"){
+
 print("mutect2 somatic")
 for ( file in mutect2 ){
 
         print(file)
 
-        snvs<-fread(file)
+        vcf<-fread(file)
 
         Cov_N<-vcf[ , tstrsplit( NORMAL, ":", keep = 2 ) ][ , tstrsplit( V1, "," ) ]
         Cov_alt_N<-Cov_N[ , as.numeric(V2) ]
@@ -134,3 +145,34 @@ for ( file in mutect2 ){
         filename<-gsub("_calls", "_pass",filename)
         write.table(foo[FILTER=="PASS",], file=filename, sep="\t", row.names=F, quote=F)
 }
+
+}
+
+
+#Haplotypecaller
+if(caller=="haplotypecaller"){
+
+print("haplotypecaller")
+for ( file in haplotypecaller ){
+
+	print(file)
+	
+	vcf<-fread(file)
+	vcf<-vcf[ !is.na(INFO), ]
+
+	SAMPLE<-colnames(vcf)[ncol(vcf)]
+	Cov<-vcf[ , tstrsplit( get(SAMPLE) , ":", keep = 3 ) ]
+	Cov_alt<-vcf[ , tstrsplit( get(SAMPLE), ":", keep = 2 ) ][ , tstrsplit( V1, "," ) ]
+	Cov<-Cov_alt[ , as.numeric(V1)+as.numeric(V2) ]
+	Cov_alt<-Cov_alt[ , as.numeric(V2) ]
+	VAF<-as.numeric(Cov_alt)/as.numeric(Cov)
+
+	foo<-cbind(vcf, Cov, VAF, Cov_alt)
+
+	
+        filename<-gsub(".tab", "_pass.tab",file)
+        write.table(foo, file=filename, sep="\t", row.names=F, quote=F)
+}
+
+}
+

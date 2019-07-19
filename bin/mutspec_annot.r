@@ -40,7 +40,7 @@ dblist<-read.table(annovarDBlist,comment.char="#")
 dblist$do<-apply(dblist, 1, function(row) file.exists(paste0(annovarDBpath,"/",row[1])) )
 for( i in 1:nrow(dblist) ){ ifelse(dblist[i,3],print(paste0("VALID : ",dblist[i,1])),print(paste0("NOT FOUND : ", dblist[i,1])) ) }
 dblist<-dblist[which(dblist$do==TRUE),]
-protocols<-sub( "\\.txt", "",  sub(".*_", "", dblist$V1) )
+protocols<-sub( "\\.txt", "",  sub(paste0(reference,"_"), "", dblist$V1) )
 protocols<-paste(protocols,collapse = ",")
 operations<-paste(dblist$V2,collapse = ",")
 if(protocols==""){ stop( paste0("ERROR : there is no valid file in ", annovarDBlist, " !") ) }
@@ -88,7 +88,8 @@ mergeAnnovarFiles<-function(dir="./"){
   for( variant in variants){
     dbname=sub(".*vcf\\.", "", variant)
     dbname=sub(".variant.*", "", dbname)
-    dbname=sub("mm10_", "", dbname)
+    dbname=sub(reference, "", dbname)
+    dbname=sub("_","",dbname)
     dbname=sub(".txt", "", dbname)
     dbname=sub("gz.","",dbname)
     if( dbname %in% c("refGene.exonic","knownGene.exonic","ensGene.exonic") ){
@@ -141,6 +142,7 @@ getStrand<-function(avtmp){
   tmp<-tmp[ !duplicated(tmp$symbol), ]
   avtmp<-merge(avtmp,tmp, by="symbol", all.x=T)
   avtmp[,symbol:=NULL]
+  avtmp[,symbol2:=NULL]
   return(avtmp)
 }
 
@@ -178,13 +180,20 @@ print(nrow(avoutput))
 print("Context annotation")
 avoutput<-getContextAnnotation(avoutput)
 print(nrow(avoutput))
-print("reorder columns")
+print("Reorder columns")
 dbnames<-colnames(avoutput)[ ! colnames(avoutput) %in% c(fixNames,"Strand","context","trinucleotide_context",colNames) ]
 setcolorder(avoutput, c(fixNames,dbnames,"Strand","context","trinucleotide_context",colNames) )
 print(nrow(avoutput))
-print("write output")
+print("Order by chromosomic location")
+avoutput$num=avoutput$Chr
+avoutput[ num=="chrX", num :="23"]
+avoutput[ num=="chrY", num :="24"]
+avoutput[, num:=as.integer(gsub("chr","",num))]
+avoutput<-avoutput[ order(c(num,Start,End,Ref,Alt)) ]
+avoutput[, num:=NULL]
+print("Write output")
 write.table(avoutput, file=out, row.names=F, sep="\t", quote=F)
-print("the end !")
+print("The end !")
 print(nrow(avoutput))
  
   
