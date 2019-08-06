@@ -61,13 +61,18 @@ if(reference=="mm9"  & nbchrom!=21){ print( paste0("WARNING : mm9db has been sel
 
 #make a name for the output file
 if ( out=="" ){ out=gsub("vcf","tab",input) }
-out<-gsub(".gz","",out)
+out<-sub(".gz","",out)
 print(paste0("Output file name : ", out))
+
+###################
+#filter PASS
+passvcf=gsub("vcf","pass.vcf",input)
+write.vcf( vcf[ vcf@fix[,'FILTER']=="PASS" ], file=passvcf )
 
 ###################
 #run annovar
 annovarBin<-paste0( gsub("table_annovar.pl","",annovarBinPath), "/table_annovar.pl")
-command=paste(annovarBin,"--buildver", reference , "--thread", threads, "--vcfinput --onetranscript --remove --otherinfo --protocol", protocols, "-operation", operations, input, annovarDBpath , sep=" ")
+command=paste(annovarBin,"--buildver", reference , "--thread", threads, "--vcfinput --onetranscript --remove --otherinfo --protocol", protocols, "-operation", operations, passvcf, annovarDBpath , sep=" ")
 print("Run table_annovar.pl")
 print(command)
 err<-system(command, ignore.stderr=T)
@@ -149,22 +154,17 @@ getStrand<-function(avtmp){
 ##########################################
 # Retrieve Context from fasta reference file
 getContextAnnotation<-function(avtmp){
-  ref<-list()
-  chromosomes<-unique(avoutput$CHROM)
-  for(chromosome in chromosomes){
-    print(paste0("reading ",chromosome))
-    chrfile<-paste0(annovarDBpath,"/",reference,"_seq/",chromosome,".fa")
-    suppressWarnings(ref[chromosome]<-readDNAStringSet(chrfile))
-  }
+  
+  ref<-readDNAStringSet(paste0(annovarDBpath,"/",reference,".fasta"))
   avtmp$context=apply( avtmp, 1, function(x) getContext(ref,x["CHROM"],x["POS"],10) )
   avtmp$trinucleotide_context=apply( avtmp, 1, function(x) getContext(ref,x["CHROM"],x["POS"],1) )
-  avtmp$trinucleotide_context<-sub("(.).(.)","\\1x\\2",avtmp$trinucleotide_context)
+  avtmp$trinucleotide_context<-sub("(.).(.)","\\1x\\2",avtmp$trinucleotide_context)  
   return(avtmp)
 }
 
 getContext<-function(ref,chr,pos,win){
   
-  ctx<-subseq(ref[[chr]], as.numeric(pos)-win,as.numeric(pos)+win)
+  ctx<-subseq(ref[[chr]], max( 1, as.numeric(pos)-win ), min( length(ref[[chr]]), as.numeric(pos)+win ))
   return(as.character(ctx))
 }
 
