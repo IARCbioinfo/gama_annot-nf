@@ -21,14 +21,14 @@
 
 | OPTIONS | TYPE | Description |
 |-------- | ---- | ----------- |
-| --input | FOLDER | Folder containing vcf to process. |
-| --annovarDBlist | FILE | File with two columns : protocols and operations (see example below). |
-| --extention | TXT | input files extension. |
-| --annovarDBpath | PATH | Path to annovarDB. |
-| --annovarBinPath | PATH | Path to table_annovar.pl. |
-| --thread | INT | Number of thread for table_annovar.pl. |
-| --vaf |  | Add columns with VAF and coverage. |
-
+| --input | FOLDER | Folder containing vcf to process |
+| --annovarDBlist | FILE | File with two columns : protocols and operations (see example below) |
+| --extention | TXT | input files extension |
+| --annovarDBpath | PATH | Path to annovarDB |
+| --annovarBinPath | PATH | Path to table_annovar.pl |
+| --thread | INT | Number of thread for table_annovar.pl |
+| --vaf |  | Add columns with VAF and coverage |
+| --caller | TXT | when using --vaf, indicate the caller (strelka2|mutect2|haplotypecaller) |
 
 #### Help section
 You can print the help manual by providing `--help` in the execution command line:
