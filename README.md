@@ -28,7 +28,7 @@
 | --annovarBinPath | PATH | Path to table_annovar.pl |
 | --thread | INT | Number of thread for table_annovar.pl |
 | --vaf |  | Add columns with VAF and coverage |
-| --caller | TXT | when using --vaf, indicate the caller (strelka2|mutect2|haplotypecaller) |
+| --caller | TXT | when using --vaf, indicate the caller (strelka2, mutect2 or haplotypecaller) |
 
 #### Help section
 You can print the help manual by providing `--help` in the execution command line:
