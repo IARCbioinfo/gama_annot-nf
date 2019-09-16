@@ -38,8 +38,10 @@ nextflow run iarcbioinfo/mutspec_annot.nf --help
 This shows details about optional and mandatory parameters provided by the user.  
 
 #### annovarDblist  .txt format
-The annovarDBlist file is where you can define annotations. The annovarDBlist file is where you can define annotations. See example [mm10.list](https://github.com/IARCbioinfo/mutspec_annot/blob/master/demo/mm10.list) in demo folder.
+The annovarDBlist file is where you can define annotations. See example [mm10.list](https://github.com/IARCbioinfo/mutspec_annot/blob/master/demo/mm10.list) in demo folder.
 
+### annovarDBpath 
+The annovarDBpath is where your annovar database is located. This folder is created using the annotate_variation.pl script from annovar. Plus you need to add int the same folder the fasta of your genome for the context annotation.
 
 #### Global parameters
 ```--annovarBinPath``` is mandatory parameters but can be defined in your nextflow config file (```~/.nextflow/config``` or ```config``` in the working directory) and so not set as inputs.
