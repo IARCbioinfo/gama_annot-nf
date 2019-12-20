@@ -2,8 +2,19 @@
 ### mutspec_annot pipeline with Nextflow
 
 #### Dependencies
-1. Install [annovar](http://annovar.openbioinformatics.org/en/latest/user-guide/download/).
-2. Install [nextflow](http://www.nextflow.io/).
+1. Install [R](https://www.r-project.org/) and libraries
+
+	```bash
+	conda install -c r r
+	R
+	install.packages(c("data.table","vcfR"))
+	if (!requireNamespace("BiocManager", quietly = TRUE))
+    		install.packages("BiocManager")
+	BiocManager::install(c("biostrings","getoptlong"))
+	```
+	
+2. Install [annovar](http://annovar.openbioinformatics.org/en/latest/user-guide/download/).
+3. Install [nextflow](http://www.nextflow.io/).
 
 	```bash
 	curl -fsSL get.nextflow.io | bash
