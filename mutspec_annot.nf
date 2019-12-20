@@ -3,11 +3,12 @@ params.input = null
 params.extension = "vcf"
 params.annovarDBlist  = null
 params.annovarDBpath  = "/data/databases/annovar/hg38db/"
-params.annovarBinPath = "~/bin/" 
+params.annovarBinPath = "/data/mca/mca_share/work/annovar/"
 params.output = "mutspec_annotation"
 params.thread = 1
 params.VAF = true
 params.caller = "strelka2"
+params.pass = "'PASS,clustered_events,clustered_events;homologous_mapping_event,tiers1,tiers2,tiers3'"
 
 if (params.help) {
     log.info ''
@@ -31,6 +32,7 @@ if (params.help) {
     log.info '    --output           FOLDER            Output Folder name.'
     log.info '    --thread           INTEGER           Number of thread for table_annovar.pl.'
     log.info '    --caller           PATH              Software used for calling (strelka2, mutect2 or haplotypecaller)'
+    log.info '    --pass             STRING            filter tags, comma separated list'
     log.info ''   
     log.info 'Flags'
     log.info ''
@@ -66,7 +68,8 @@ process mutspec_annot {
   '''
   echo !{tsize}
   echo !{sample_tag}
-  mutspec_annot.r -i !{vcf} -l !{params.annovarDBlist} -a !{params.annovarDBpath} -b !{params.annovarBinPath} -t !{params.thread}
+  echo mutspec_annot.r -i !{vcf} -l !{params.annovarDBlist} -a !{params.annovarDBpath} -b !{params.annovarBinPath} -t !{params.thread} -p "!{params.pass}"
+  mutspec_annot.r -i !{vcf} -l !{params.annovarDBlist} -a !{params.annovarDBpath} -b !{params.annovarBinPath} -t !{params.thread} -p "!{params.pass}"
   '''
 
 }
