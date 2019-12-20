@@ -15,17 +15,18 @@ suppressPackageStartupMessages(library(Biostrings))
 
 out=""
 annovarDBpath="/data/databases/annovar/mm10db"
-annovarBinPath=""
+annovarBinPath="~/bin/"
 threads=1
+PASS="PASS"
 
 GetoptLong(matrix(c("input|i=s",          "vcf input file",	
                     "annovarDBlist|l=s",  "txt file listing annovar databases for annotation",
                     "annovarDBpath|a=s",  "path to annovarDB",
                     "annovarBinPath|b=s", "path to table_annovar.pl",
                     "out|o=s",  	  "output file name",
-                    "threads|t=s",        "threads"
+                    "threads|t=s",        "threads",
+                    "PASS|p=s",           "filter tag"
 ), ncol=2, byrow=TRUE))
-
 
 print("Check input files")
 #check annovarDBpath
@@ -66,8 +67,11 @@ print(paste0("Output file name : ", out))
 
 ###################
 #filter PASS
+PASS<-unlist(strsplit(PASS,","))
+print(paste("PASS=",PASS))
 passvcf=gsub("vcf","pass.vcf",input)
-write.vcf( vcf[ vcf@fix[,'FILTER']=="PASS" ], file=passvcf )
+passvcf=gsub("vcf$","vcf.gz",passvcf)
+write.vcf( vcf[ vcf@fix[,'FILTER'] %in% PASS ], file=passvcf )
 
 ###################
 #run annovar
@@ -155,7 +159,8 @@ getStrand<-function(avtmp){
 # Retrieve Context from fasta reference file
 getContextAnnotation<-function(avtmp){
   
-  ref<-readDNAStringSet(paste0(annovarDBpath,"/",reference,".fasta"))
+  reffile<-list.files( path = annovarDBpath, pattern=paste0(reference,".fa"), full.names =T )
+  ref<-readDNAStringSet(reffile)
   avtmp$context=apply( avtmp, 1, function(x) getContext(ref,x["CHROM"],x["POS"],10) )
   avtmp$trinucleotide_context=apply( avtmp, 1, function(x) getContext(ref,x["CHROM"],x["POS"],1) )
   avtmp$trinucleotide_context<-sub("(.).(.)","\\1x\\2",avtmp$trinucleotide_context)  

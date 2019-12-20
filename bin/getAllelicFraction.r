@@ -2,14 +2,15 @@
 library(data.table)
 caller="strelka2"
 suppressPackageStartupMessages(library(GetoptLong))
-GetoptLong(matrix(c( "caller|c=s", "caller=c(strelka2,mutect2,haplotypecaller)"	), ncol=2, byrow=TRUE))
+GetoptLong(matrix(c( "caller|c=s", "caller=c(strelka2,mutect2,haplotypecaller,muse)"	), ncol=2, byrow=TRUE))
 
 somatic<-list.files(pattern="*somatic.snvs.tab$")
 germline<-list.files(pattern="*germline.tab$")
 mutect2<-list.files(pattern="*calls.tab$")
 haplotypecaller<-list.files(pattern="*.tab$")
+muse<-list.files(pattern="*.tab$")
 
-if (! caller %in% c("strelka2","mutect2","haplotypecaller") ){ stop( paste0("sorry, ", caller,  " is not suported, you cannot use --VAF option") )  }
+if (! caller %in% c("strelka2","mutect2","haplotypecaller","muse") ){ stop( paste0("sorry, ", caller,  " is not suported, you cannot use --VAF option") )  }
 
 #strelka germline
 if (caller=="strelka2"){
@@ -23,7 +24,7 @@ for (file in germline){
 	vcf<-fread(file)
         vcf<-vcf[vcf$FILTER=="PASS" & ALT!="."]
 
-	T<-colnames(vcf)[10] # name of sample
+	T<-colnames(vcf)[ncol(vcf)] # name of sample
 
 	if (nrow(vcf)>0){
 		vcf[ ALT!="."  ,  COV :=  tstrsplit( tstrsplit(get(T),":")[4][[1]], "," )  ]
@@ -40,10 +41,11 @@ for (file in germline){
 		vcf$VAF_ALT<-as.numeric(vcf$VAF_ALT)/as.numeric(vcf$COV)
 	}
 
-        filename<-gsub("_L00.","",file)
-        filename<-gsub("BQSrecalibrated.bam","",filename)
-	filename<-gsub(".fix",".pass",filename)
-        print(filename)
+    filename<-gsub("_L00.","",file)
+    filename<-gsub("BQSrecalibrated.bam","",filename)
+    filename<-gsub("_indelrealigned","",filename)
+	filename<-gsub(".tab",".pass.tab",filename)
+	filename<-gsub("__", "_",filename)
 	write.table(vcf, file=filename , sep="\t", row.names=F, quote=F)
 }
 
@@ -74,9 +76,9 @@ for (file in somatic){
 		snvs[  ,  Cov_alt_T  :=sapply( 1:nrow(snvs), function(x) { sub(",.*","",strsplit(snvs$TUMOR[x],":")[[1]][snvs$index[x]]) } ) ]
 
 		snvs$VAF_N<-as.numeric(snvs$VAF_N)/as.numeric(snvs$Cov_N)
-                snvs$VAF_T<-as.numeric(snvs$VAF_T)/as.numeric(snvs$Cov_T)
+        	snvs$VAF_T<-as.numeric(snvs$VAF_T)/as.numeric(snvs$Cov_T)
 
-                snvs<-snvs[ , index:=NULL ]
+        	snvs<-snvs[ , index:=NULL ]
 	}
 
 	#indels
@@ -101,16 +103,18 @@ for (file in somatic){
 		indels[ , Cov_alt_T := sub(",.*","",Cov_alt_T) ]
 
 		indels$VAF_N<-as.numeric(indels$VAF_N)/as.numeric(indels$Cov_N)
-                indels$VAF_T<-as.numeric(indels$VAF_T)/as.numeric(indels$Cov_T)
+        	indels$VAF_T<-as.numeric(indels$VAF_T)/as.numeric(indels$Cov_T)
 
 	}
 
-        tab <-snvs
+    tab <-snvs
 	if ( ncol(snvs) == ncol(indels) ){ tab<-rbind(snvs,indels) }
 
 	filename<-gsub("_L00._","",file)
-        filename<-gsub("BQSrecalibrated.bam","",filename)
+    	filename<-gsub("BQSrecalibrated.bam","",filename)
+    	filename<-gsub("_indelrealigned","",filename)
 	filename<-gsub("snvs.","",filename)
+	filename<-gsub("__", "_",filename)
 	write.table(tab, file=filename , sep="\t", row.names=F, quote=F)
 }
 
@@ -122,28 +126,31 @@ if( caller=="mutect2"){
 print("mutect2 somatic")
 for ( file in mutect2 ){
 
-        print(file)
+    print(file)
 
-        vcf<-fread(file)
+    vcf<-fread(file)
 
-        Cov_N<-vcf[ , tstrsplit( NORMAL, ":", keep = 2 ) ][ , tstrsplit( V1, "," ) ]
-        Cov_alt_N<-Cov_N[ , as.numeric(V2) ]
-        Cov_N<-Cov_N[ , as.numeric(V1)+as.numeric(V2) ]
+    Cov_N<-vcf[ , tstrsplit( NORMAL, ":", keep = 2 ) ][ , tstrsplit( V1, "," ) ]
+    Cov_alt_N<-Cov_N[ , as.numeric(V2) ]
+    Cov_N<-Cov_N[ , as.numeric(V1)+as.numeric(V2) ]
 
-        VAF_N<- vcf[ , c("VAF_N") := tstrsplit( NORMAL, ":", keep = 3 ) ][,VAF_N]
+    VAF_N<- vcf[ , c("VAF_N") := tstrsplit( NORMAL, ":", keep = 3 ) ][,VAF_N]
 
-        Cov_T<-vcf[ , tstrsplit( TUMOR, ":", keep = 2 ) ][ ,  tstrsplit( V1, "," ) ]
-        Cov_alt_T<-Cov_T[ , as.numeric(V2) ]
-        Cov_T<-Cov_T[ , as.numeric(V1)+as.numeric(V2) ]
+    Cov_T<-vcf[ , tstrsplit( TUMOR, ":", keep = 2 ) ][ ,  tstrsplit( V1, "," ) ]
+    Cov_alt_T<-Cov_T[ , as.numeric(V2) ]
+    Cov_T<-Cov_T[ , as.numeric(V1)+as.numeric(V2) ]
 
-        VAF_T<- vcf[ , c("VAF_T") := tstrsplit( TUMOR, ":", keep = 3 ) ][,VAF_T]
+    VAF_T<- vcf[ , c("VAF_T") := tstrsplit( TUMOR, ":", keep = 3 ) ][,VAF_T]
 
-        foo<-cbind(vcf, Cov_N, Cov_T, VAF_N, VAF_T, Cov_alt_N, Cov_alt_T)
+    foo<-cbind(vcf, Cov_N, Cov_T, VAF_N, VAF_T, Cov_alt_N, Cov_alt_T)
         
-        filename<-gsub("_L00._","",file)
-        filename<-gsub("_BQSrecalibrated","",filename)
-        filename<-gsub("_calls", "_pass",filename)
-        write.table(foo[FILTER=="PASS",], file=filename, sep="\t", row.names=F, quote=F)
+    filename<-gsub("_L00._","",file)
+    filename<-gsub("_BQSrecalibrated","",filename)
+	filename<-gsub("_indelrealigned","",filename)
+    filename<-gsub("_calls", "_pass",filename)
+	filename<-gsub("__", "_",filename)
+    #write.table(foo[FILTER=="PASS",], file=filename, sep="\t", row.names=F, quote=F)
+	write.table(foo, file=filename, sep="\t", row.names=F, quote=F)
 }
 
 }
@@ -169,10 +176,52 @@ for ( file in haplotypecaller ){
 
 	foo<-cbind(vcf, Cov, VAF, Cov_alt)
 
-	
-        filename<-gsub(".tab", "_pass.tab",file)
-        write.table(foo, file=filename, sep="\t", row.names=F, quote=F)
+	filename<-gsub("_L00._","",file)
+    filename<-gsub("_BQSrecalibrated","",filename)
+    filename<-gsub("_indelrealigned","",filename)
+    filename<-gsub(".tab", "_pass.tab",filename)
+	filename<-gsub("__", "_",filename)
+    write.table(foo, file=filename, sep="\t", row.names=F, quote=F)
 }
 
 }
+
+
+#Muse
+if(caller=="muse"){
+
+print("muse")
+for ( file in muse ){
+
+	print(file)
+
+	vcf<-fread(file)
+	vcf<-vcf[ !is.na(INFO), ]
+	Cov_N<-vcf[ , tstrsplit( NORMAL, ":", keep = 2 ) ]
+	Cov_N<-Cov_N[ , as.numeric(V1) ]
+	Cov_alt_N<- vcf[ , tstrsplit( NORMAL, ":", keep = 3 ) ][ ,  tstrsplit( V1, "," ) ]
+	Cov_alt_N<-Cov_alt_N[ , as.numeric(V2) ]
+    VAF_N<- Cov_alt_N / Cov_N
+
+	Cov_T<-vcf[ , tstrsplit( TUMOR, ":", keep = 2 ) ]
+	Cov_T<-Cov_T[ , as.numeric(V1) ]
+	Cov_alt_T<- vcf[ , tstrsplit( TUMOR, ":", keep = 3 ) ][ ,  tstrsplit( V1, "," ) ]
+	Cov_alt_T<-Cov_alt_T[ , as.numeric(V2) ]
+    VAF_T<- as.numeric(Cov_alt_T) / as.numeric(Cov_T)
+
+    foo<-cbind(vcf, Cov_N, Cov_T, VAF_N, VAF_T, Cov_alt_N, Cov_alt_T)
+        
+    filename<-gsub("_L00._","",file)
+    filename<-gsub("_BQSrecalibrated","",filename)
+	filename<-gsub("_indelrealigned","",filename)
+	filename<-gsub(".txt", "",filename)
+	filename<-gsub(".bam", "",filename)
+	filename<-gsub(".call", "",filename)
+    filename<-gsub(".tab", "_pass.tab",filename)
+	filename<-gsub("__", "_",filename)
+    write.table(foo, file=filename, sep="\t", row.names=F, quote=F)
+}
+
+}
+
 
