@@ -36,7 +36,7 @@
 |-------- | ---- | ----------- |
 | --input | FOLDER | Folder containing vcf to process |
 | --annovarDBlist | FILE | File with two columns : protocols and operations (see example below) |
-| --extention | TXT | input files extension |
+| --extension | TXT | input files extension |
 | --annovarDBpath | PATH | Path to annovarDB |
 | --annovarBinPath | PATH | Path to table_annovar.pl |
 | --thread | INT | Number of thread for table_annovar.pl |
