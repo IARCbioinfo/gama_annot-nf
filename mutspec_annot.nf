@@ -43,11 +43,11 @@ if (params.help) {
 
 
 
-//vcf=Channel.fromFilePairs( params.input + '*{snvs,indels}*' + params.extension )
+//vcf=Channel.fromFilePairs( params.input + '/*{snvs,indels}*' + params.extension )
 //System.exit(0)
 tsize=2
-Channel.fromPath( params.input + '*indels*' + params.extension ).ifEmpty { tsize=1 }
-allvcf = Channel.fromPath( params.input + '*' + params.extension ).ifEmpty { error "empty table folder, please verify your input." }
+Channel.fromPath( params.input + '/*indels*' + params.extension ).ifEmpty { tsize=1 }
+allvcf = Channel.fromPath( params.input + '/*' + params.extension ).ifEmpty { error "empty table folder, please verify your input." }
 
 
 process mutspec_annot {
