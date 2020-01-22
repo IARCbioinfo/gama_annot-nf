@@ -34,7 +34,7 @@
 
 | OPTIONS | TYPE | Description |
 |-------- | ---- | ----------- |
-| --input | FOLDER | Folder containing vcf to process (path should end with "/") |
+| --input | FOLDER | Folder containing vcf to process |
 | --annovarDBlist | FILE | File with two columns : protocols and operations (see example below) |
 | --extention | TXT | input files extension |
 | --annovarDBpath | PATH | Path to annovarDB |
