@@ -8,7 +8,7 @@ params.output = "mutspec_annotation"
 params.thread = 1
 params.VAF = true
 params.caller = "strelka2"
-#params.pass = "'PASS,clustered_events,clustered_events;homologous_mapping_event,tiers1,tiers2,tiers3'"
+//params.pass = "'PASS,clustered_events,clustered_events;homologous_mapping_event,tiers1,tiers2,tiers3'"
 params.pass = "'PASS'"
 
 if (params.help) {
