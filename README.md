@@ -1,6 +1,8 @@
 # gama_annot-nf
 ### gama_annot pipeline with Nextflow
 
+Annotate vcf files using annovar + additional scripts. Works for Mutect2, Strelka2 and HaplotypeCaller outputs
+
 #### Dependencies
 1. Install [R](https://www.r-project.org/) and libraries
 
