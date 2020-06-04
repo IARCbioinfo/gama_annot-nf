@@ -1,5 +1,5 @@
-# mutspec_annot-nf
-### mutspec_annot pipeline with Nextflow
+# gama_annot-nf
+### gama_annot pipeline with Nextflow
 
 #### Dependencies
 1. Install [R](https://www.r-project.org/) and libraries
@@ -28,7 +28,7 @@
 
 #### Execution
 
- `nextflow run iarcbioinfo/mutspec-annot.nf --input vcf_folder/ --annovarDBlist Dblist.txt --annovarDBpath /data/annnovar/hg38db/ --pass PASS`
+ `nextflow run iarcbioinfo/gama_annot-nf --input vcf_folder/ --annovarDBlist Dblist.txt --annovarDBpath /data/annnovar/hg38db/ --pass PASS`
 
 #### Options
 
@@ -47,12 +47,12 @@
 #### Help section
 You can print the help manual by providing `--help` in the execution command line:
 ```bash
-nextflow run iarcbioinfo/mutspec_annot.nf --help
+nextflow run iarcbioinfo/gama_annot-nf --help
 ```
 This shows details about optional and mandatory parameters provided by the user.  
 
 #### annovarDblist  .txt format
-The annovarDBlist file is where you can define annotations. See example [mm10.list](https://github.com/IARCbioinfo/mutspec_annot/blob/master/demo/mm10.list) in demo folder.
+The annovarDBlist file is where you can define annotations. See example [mm10.list](https://github.com/IARCbioinfo/gama_annot-nf/blob/master/demo/mm10.list) in demo folder.
 
 ### annovarDBpath 
 The annovarDBpath is where your annovar database is located. This folder is created using the annotate_variation.pl script from annovar. The name of the folder should be genomedb (for example hg38db or mm10db).

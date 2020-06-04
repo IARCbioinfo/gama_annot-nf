@@ -4,7 +4,7 @@ params.extension = "vcf"
 params.annovarDBlist  = null
 params.annovarDBpath  = "/data/databases/annovar/hg38db/"
 params.annovarBinPath = "/data/mca/mca_share/work/annovar/"
-params.output = "mutspec_annotation"
+params.output = "annotation"
 params.thread = 1
 params.VAF = true
 params.caller = "strelka2"
@@ -18,7 +18,7 @@ if (params.help) {
     log.info '--------------------------------------------------'
     log.info ''
     log.info 'Usage: '
-    log.info 'nextflow run mutspec_annot.nf --input vcfFolder/ --annovarDBpath /data/annovar/mm10db/'
+    log.info 'nextflow run gama_annot.nf --input vcfFolder/ --annovarDBpath /data/annovar/mm10db/'
     log.info ''
     log.info 'Mandatory arguments:'
     log.info ''
@@ -51,7 +51,7 @@ Channel.fromPath( params.input + '/*indels*' + params.extension ).ifEmpty { tsiz
 allvcf = Channel.fromPath( params.input + '/*' + params.extension ).ifEmpty { error "empty table folder, please verify your input." }
 
 
-process mutspec_annot {
+process gama_annot {
 
   publishDir params.output, mode: 'copy'
 
@@ -69,15 +69,15 @@ process mutspec_annot {
   '''
   echo !{tsize}
   echo !{sample_tag}
-  echo mutspec_annot.r -i !{vcf} -l !{params.annovarDBlist} -a !{params.annovarDBpath} -b !{params.annovarBinPath} -t !{params.thread} -p "!{params.pass}"
-  mutspec_annot.r -i !{vcf} -l !{params.annovarDBlist} -a !{params.annovarDBpath} -b !{params.annovarBinPath} -t !{params.thread} -p "!{params.pass}"
+  echo annot.r -i !{vcf} -l !{params.annovarDBlist} -a !{params.annovarDBpath} -b !{params.annovarBinPath} -t !{params.thread} -p "!{params.pass}"
+  annot.r -i !{vcf} -l !{params.annovarDBlist} -a !{params.annovarDBpath} -b !{params.annovarBinPath} -t !{params.thread} -p "!{params.pass}"
   '''
 
 }
 
 if (params.VAF){
 
-  process mutspec_VAF {
+  process gama_VAF {
 
     publishDir params.output, mode: 'move'
 

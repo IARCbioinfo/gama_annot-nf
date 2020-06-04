@@ -1,7 +1,7 @@
 #! /usr/bin/env Rscript
 #####################################################################################
 #
-# Title		: mutspec_annot.r
+# Title		: annot.r
 # Author	: CahaisV@iarc.fr
 # Date		: 03/07/2019
 # Last Update	: 03/07/2019
