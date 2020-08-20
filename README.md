@@ -29,15 +29,9 @@ Annotate vcf files using annovar + additional scripts. Works for Mutect2, Strelk
 
 #### Execution
 
-<<<<<<< HEAD
  `nextflow run iarcbioinfo/gama_annot-nf --input vcf_folder/ --annovarDBlist Dblist.txt --annovarDBpath /data/annnovar/hg38db/ --pass PASS --context --caller strelka2 --extention vcf.gz`
 
  `nextflow run iarcbioinfo/gama_annot-nf --input vcf_folder/ --annovarDBlist Dblist.txt --annovarDBpath /data/annnovar/hg38db/ --pass PASS,clustered_events --context --caller mutect2 --extention vcf`
-=======
- `nextflow run iarcbioinfo/gama_annot-nf --input vcf_folder/ --annovarDBlist Dblist.txt --annovarDBpath /data/annnovar/hg38db/ --pass PASS --context --caller strelka2 --extention vcf.gz`
-
- `nextflow run iarcbioinfo/gama_annot-nf --input vcf_folder/ --annovarDBlist Dblist.txt --annovarDBpath /data/annnovar/hg38db/ --pass PASS,clustered_events --context --caller mutect2 --extention vcf`
->>>>>>> 72540b6d9b0a32d7dcc88d56f7640759cdcd9977
 
 #### Options
 
