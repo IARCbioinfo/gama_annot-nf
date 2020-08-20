@@ -7,7 +7,6 @@
 	```bash
 	conda install -c r r
 	R
-	install.packages(c("data.table","vcfR"))
 	if (!requireNamespace("BiocManager", quietly = TRUE))
     		install.packages("BiocManager")
 	BiocManager::install(c("biostrings","getoptlong"))
@@ -28,7 +27,9 @@
 
 #### Execution
 
- `nextflow run iarcbioinfo/gama_annot-nf --input vcf_folder/ --annovarDBlist Dblist.txt --annovarDBpath /data/annnovar/hg38db/ --pass PASS`
+ `nextflow run iarcbioinfo/gama_annot-nf --input vcf_folder/ --annovarDBlist Dblist.txt --annovarDBpath /data/annnovar/hg38db/ --pass PASS --context --caller strelka2 --extention vcf.gz
+
+  nextflow run iarcbioinfo/gama_annot-nf --input vcf_folder/ --annovarDBlist Dblist.txt --annovarDBpath /data/annnovar/hg38db/ --pass PASS,clustered_events --context --caller mutect2 --extention vcf
 
 #### Options
 
@@ -40,9 +41,8 @@
 | --annovarDBpath | PATH | Path to annovarDB |
 | --annovarBinPath | PATH | Path to table_annovar.pl |
 | --thread | INT | Number of thread for table_annovar.pl |
-| --vaf |  | Add columns with VAF and coverage |
 | --caller | TXT | when using --vaf, indicate the caller (strelka2, mutect2 or haplotypecaller) |
-| --pass | TXT | Value on which the variants should be filtered prior to annotation (example: PASS) | 
+| --pass | TXT | Value on which the variants should be filtered prior to annotation (default : PASS) | 
 
 #### Help section
 You can print the help manual by providing `--help` in the execution command line:
@@ -68,6 +68,7 @@ profiles {
         standard {
                 params {
                    annovarBinPath = '/data/annovar/bin/'
+                   annovarDBpath = '/data/annovarDB/hg38db/'
                 }
         }
 ```

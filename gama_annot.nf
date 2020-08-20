@@ -3,13 +3,14 @@ params.input = null
 params.extension = "vcf"
 params.annovarDBlist  = null
 params.annovarDBpath  = "/data/databases/annovar/hg38db/"
-params.annovarBinPath = "/data/mca/mca_share/work/annovar/"
-params.output = "annotation"
-params.thread = 1
-params.VAF = true
-params.caller = "strelka2"
-//params.pass = "'PASS,clustered_events,clustered_events;homologous_mapping_event,tiers1,tiers2,tiers3'"
+params.annovarBinPath = "~/bin/annovar/"
+params.output = "gama_annot"
+params.cpu = 8
+params.mem = 64
+params.context = false
+params.caller = "none"
 params.pass = "'PASS'"
+//params.pass = "'PASS,clustered_events,clustered_events;homologous_mapping_event,tiers1,tiers2,tiers3'"
 
 if (params.help) {
     log.info ''
@@ -23,7 +24,7 @@ if (params.help) {
     log.info 'Mandatory arguments:'
     log.info ''
     log.info '    --input            FOLDER            Folder containing vcf to process.'
-    log.info '    --annovarDBlist    FILE              File with two columns : protocols and operations.'
+    log.info '    --annovarDBlist    FILE              File with two columns : protocols and operations (see anovar documentation).'
     log.info ''
     log.info 'Optional arguments:'
     log.info ''
@@ -31,21 +32,19 @@ if (params.help) {
     log.info '    --annovarDBpath    PATH              Path to annovarDB.'
     log.info '    --annovarBinPath   PATH              Path to table_annovar.pl.'
     log.info '    --output           FOLDER            Output Folder name.'
-    log.info '    --thread           INTEGER           Number of thread for table_annovar.pl.'
-    log.info '    --caller           PATH              Software used for calling (strelka2, mutect2 or haplotypecaller)'
+    log.info '    --cpu              INTEGER           Number of cpu used by table_annovar.pl default (8)'
+    log.info '    --mem              INTEGER           Size of memory used by gama_annot in GB default (64)'
+    log.info '    --caller           STRING            Add columns with VAF and coverage for corresponding software (strelka2, mutect2 or haplotypecaller)'
     log.info '    --pass             STRING            filter tags, comma separated list'
     log.info ''   
     log.info 'Flags'
     log.info ''
-    log.info '   --vaf                                 Add columns with VAF and coverage.'
+    log.info '   --context                             Add context, strand and user Annotations'
     log.info '   --help                                Display this message.'
     exit 1
 }
 
 
-
-//vcf=Channel.fromFilePairs( params.input + '/*{snvs,indels}*' + params.extension )
-//System.exit(0)
 tsize=2
 Channel.fromPath( params.input + '/*indels*' + params.extension ).ifEmpty { tsize=1 }
 allvcf = Channel.fromPath( params.input + '/*' + params.extension ).ifEmpty { error "empty table folder, please verify your input." }
@@ -55,37 +54,66 @@ process gama_annot {
 
   publishDir params.output, mode: 'copy'
 
-  cpus params.thread
+  memory = params.mem+'.GB'
+  cpus params.cpu
   tag { sample_tag }
 
   input:
   file vcf from allvcf
 
   output:
-  set val(sample_tag), file("*tab") into annotated
+  set val(sample_tag), file("*tsv") into annotated
 
   shell:
   sample_tag = vcf.baseName.replaceFirst(/(snvs|indels).*/,"")
   '''
   echo !{tsize}
   echo !{sample_tag}
-  echo annot.r -i !{vcf} -l !{params.annovarDBlist} -a !{params.annovarDBpath} -b !{params.annovarBinPath} -t !{params.thread} -p "!{params.pass}"
-  annot.r -i !{vcf} -l !{params.annovarDBlist} -a !{params.annovarDBpath} -b !{params.annovarBinPath} -t !{params.thread} -p "!{params.pass}"
+  echo annot.r -i !{vcf} -l !{params.annovarDBlist} -a !{params.annovarDBpath} -b !{params.annovarBinPath} -t !{params.cpu} -p "!{params.pass}"
+  annot.r -i !{vcf} -l !{params.annovarDBlist} -a !{params.annovarDBpath} -b !{params.annovarBinPath} -t !{params.cpu} -p "!{params.pass}"
   '''
 
 }
 
-if (params.VAF){
+if (params.context){
+
+process gama_context {
+    
+    publishDir params.output, mode: 'copy'
+
+    memory = params.mem+'.GB'
+    cpus params.cpu
+
+    input:
+    set val(sample_tag), file(tab) from annotated
+
+    output:
+    set val(sample_tag), file("*1.tsv") into res_context
+
+    shell:
+    '''
+    getContext.r -a !{params.annovarDBpath}
+    '''
+}
+
+}else{
+   res_context = annotated
+}
+
+if (params.caller!="none"){
 
   process gama_VAF {
 
     publishDir params.output, mode: 'move'
 
+    memory = params.mem+'.GB'
+    cpus params.cpu
+    
     input:
-    set val(sample_tag), file(tab) from annotated.groupTuple(size: tsize )
+    set val(sample_tag), file(tab) from res_context.groupTuple(size: tsize )
 
     output:
-    file "*tab" into table
+    file "*2.tsv" into table
 
     shell:
     '''
