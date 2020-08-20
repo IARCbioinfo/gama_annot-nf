@@ -42,9 +42,11 @@ Annotate vcf files using annovar + additional scripts. Works for Mutect2, Strelk
 | --extension | TXT | input files extension |
 | --annovarDBpath | PATH | Path to annovarDB |
 | --annovarBinPath | PATH | Path to table_annovar.pl |
-| --thread | INT | Number of thread for table_annovar.pl |
-| --caller | TXT | when using --vaf, indicate the caller (strelka2, mutect2 or haplotypecaller) |
-| --pass | TXT | Value on which the variants should be filtered prior to annotation (default : PASS) | 
+| --cpu | INT | Number of used by table_annovar.pl default (8) |
+| --mem | INT | Size of memory used by gama_annot in GB default (64) |
+| --caller | TXT | Add columns with VAF and coverage for corresponding software (strelka2, mutect2 or haplotypecaller)' |
+| --pass | TXT | Value on which the variants should be filtered prior to annotation (default : PASS) |
+| --context | FLAG | Add context, strand and user Annotations | 
 
 #### Help section
 You can print the help manual by providing `--help` in the execution command line:
