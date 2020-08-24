@@ -108,6 +108,7 @@ for (file in somatic){
 	if ( ncol(snvs) == ncol(indels) ){ tab<-rbind(snvs,indels) }
 
 	filename<-gsub(".1.tsv",".tsv",file)
+	filename<-gsub(".snvs", "", filename)
 	filename<-gsub(".tsv",".2.tsv",filename)
 	write.table(tab, file=filename , sep="\t", row.names=F, quote=F)
 }

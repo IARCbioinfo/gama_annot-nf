@@ -61,8 +61,8 @@ getContextAnnotation<-function(avtmp){
   #avtmp$trinucleotide_context=apply( avtmp, 1, function(x) getContext(ref,x["CHROM"],x["POS"],1) )
   avtmp[, context:=getContext(ref,CHROM,POS,10)]
   avtmp$context<-as.character(avtmp$context)
-  avtmp[, trinucleotide_context:=substr(context, 8, 14)]
-  avtmp$trinucleotide_context<-sub("(...).(...)","\\1x\\2",avtmp$trinucleotide_context)  
+  avtmp[, trinucleotide_context:=substr(context, 10, 12)]
+  avtmp$trinucleotide_context<-sub("(.).(.)","\\1x\\2",avtmp$trinucleotide_context)  
   return(avtmp)
 }
 
@@ -112,6 +112,15 @@ if (grepl("RData",userAnnot)){
         avoutput<-addUserAnnot(avoutput,dt_reg)
     }else {print(paste0("WARNING : column names of ", userAnnot, " must be Chr, Start, End and type. Cancel user annot"))}
 }
+
+#reorder lines
+print("Order by chromosomic location")
+avoutput$num=avoutput$Chr
+avoutput[ num=="chrX", num :="23"]
+avoutput[ num=="chrY", num :="24"]
+avoutput[, num:=as.integer(gsub("chr","",num))]
+avoutput<-avoutput[ order(cnum,Start,End,Ref,Alt), ]
+avoutput[, num:=NULL]
 
 #reorder columns
 setcolorder(avoutput, c(startcols,"Strand","context","trinucleotide_context",endcols) )
