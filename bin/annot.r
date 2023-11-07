@@ -25,7 +25,7 @@ GetoptLong(matrix(c("input|i=s",          "vcf input file",
                     "annovarDBpath|a=s",  "path to annovarDB",
                     "annovarBinPath|b=s", "path to table_annovar.pl",
                     "out|o=s",  	        "output file name",
-                    "threads|t=s",        "threads",
+                    "threads|t=i",        "threads",
                     "PASS|p=s",           "filter tag",
                     "keepNonStandard|k",  "keep Non Standard Chromosomes",
                     "userAnnot|u=s",      "additional user annotations"
