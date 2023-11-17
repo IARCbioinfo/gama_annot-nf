@@ -11,6 +11,7 @@
 suppressPackageStartupMessages(library(data.table))
 suppressPackageStartupMessages(library(GetoptLong))
 suppressPackageStartupMessages(library(Biostrings))
+library(parallel)
 
 userAnnot=""
 annovarDBpath="/data/databases/annovar/mm10db"
@@ -119,7 +120,7 @@ avoutput$num=avoutput$Chr
 avoutput[ num=="chrX", num :="23"]
 avoutput[ num=="chrY", num :="24"]
 avoutput[, num:=as.integer(gsub("chr","",num))]
-avoutput<-avoutput[ order(cnum,Start,End,Ref,Alt), ]
+avoutput<-avoutput[ order(num,Start,End,Ref,Alt), ]
 avoutput[, num:=NULL]
 
 #reorder columns
