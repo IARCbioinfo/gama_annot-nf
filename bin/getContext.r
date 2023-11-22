@@ -11,6 +11,7 @@
 suppressPackageStartupMessages(library(data.table))
 suppressPackageStartupMessages(library(GetoptLong))
 suppressPackageStartupMessages(library(Biostrings))
+suppressPackageStartupMessages(library(parallel))
 
 userAnnot=""
 annovarDBpath="/data/databases/annovar/mm10db"
