@@ -58,8 +58,20 @@ if( grepl(".gz$",input)){
   vcf<-fread(cmd=paste("zcat", input, "| grep -v '##' "))
 }else{
   system(command = paste("grep '##'", input, "> tmp") ) #save headers in tmp file
+  normal_sample <- system(command = paste("grep 'normal_sample'", input, "|cut -d = -f 2"),intern = TRUE)
+  tumor_sample <- system(command = paste("grep 'tumor_sample'", input, "|cut -d = -f 2"),intern = TRUE)
   vcf<-fread(cmd=paste("cat", input, "| grep -v '##' "))
+  if (normal_sample != "" && tumor_sample != ""){
+    cnames <- (colnames(vcf))
+    cnames[which (cnames==normal_sample)] <- "NORMAL"
+    cnames[which (cnames==tumor_sample)] <- "TUMOR"
+    colnames(vcf) <- cnames
+  }
 }
+  print(colnames(vcf))
+
+
+
 colnames(vcf)[1]<-"CHROM"
 colNames<-colnames(vcf)
 fixNames=c("Chr","Start","End","Ref","Alt")
