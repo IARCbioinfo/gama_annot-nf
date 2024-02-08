@@ -67,6 +67,16 @@ if (params.help) {
 /************************ handle global parameters *************************************/
 /***************************************************************************************/
 
+log.info ""
+log.info "input_folder          = ${params.input_folder}"
+log.info "annovarDBlist         = ${params.annovarDBlist}"
+log.info "annovarDBpath         = ${params.annovarDBpath}"
+log.info "annovarBinPath        = ${params.annovarBinPath}"
+log.info "output_folder         = ${params.output_folder}"
+log.info "cpu                   = ${params.cpu}"
+log.info "mem                   = ${params.mem}"
+log.info "pass                  = ${params.pass}"
+log.info ""
 
 /***************************************************************************************/
 /************************  Process   ***************************************************/
