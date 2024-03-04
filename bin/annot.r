@@ -31,6 +31,8 @@ GetoptLong(matrix(c("input|i=s",          "vcf input file",
                     "userAnnot|u=s",      "additional user annotations"
 ), ncol=2, byrow=TRUE))
 
+print(PASS)
+
 print("Check input files")
 #check annovarDBpath
 if(!file.exists(annovarDBpath)){ stop( paste0("ERROR : ", annovarDBpath, " do not exit !") ) }
@@ -99,7 +101,7 @@ PASS<-unlist(strsplit(PASS,","))
 print(paste("PASS=",PASS))
 #passvcf=gsub(".tsv","_pass.vcf.gz",out)
 #write.vcf( vcf[ vcf@fix[,'FILTER'] %in% PASS ], file=passvcf )
-vcf<-vcf[ FILTER %in% PASS]
+if(!"all" %in% PASS) { vcf<-vcf[ FILTER %in% PASS] }
 if(nrow(vcf)==0){ stop("ERROR : None of the variants pass filters") }
 fwrite( vcf , sep="\t", file="tmp", append=TRUE)
 
