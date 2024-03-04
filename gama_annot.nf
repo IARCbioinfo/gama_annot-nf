@@ -24,6 +24,7 @@ params.output_folder = "gama_annot"
 params.cpu = 8
 params.mem = 64
 params.pass = "'PASS'"
+params.tags = "'.bam|.vcf|.tsv|.somatic|.germline|.calls|.alt|.gz|.PASS|.filtered'"
 //params.pass = "'PASS,clustered_events,clustered_events;homologous_mapping_event,tiers1,tiers2,tiers3'"
 
 
@@ -45,17 +46,18 @@ if (params.help) {
     log.info ''
     log.info 'Mandatory arguments:'
     log.info ''
-    log.info '    --input            FOLDER            Folder containing vcf to process.'
+    log.info '    --input_folder     FOLDER            Folder containing vcf to process.'
     log.info '    --annovarDBlist    FILE              File with two columns : protocols and operations (see anovar documentation).'
     log.info ''
     log.info 'Optional arguments:'
     log.info ''
     log.info '    --annovarDBpath    PATH              Path to annovarDB.'
     log.info '    --annovarBinPath   PATH              Path to table_annovar.pl.'
-    log.info '    --output           FOLDER            Output Folder name.'
+    log.info '    --output_folder    FOLDER            Output Folder name.'
     log.info '    --cpu              INTEGER           Number of cpu used by table_annovar.pl default (8)'
     log.info '    --mem              INTEGER           Size of memory used by gama_annot in GB default (64)'
-    log.info '    --pass             STRING            filter tags, comma separated list'
+    log.info '    --pass             STRING            filter flags, comma separated list'
+    log.info '    --tags             STRING            strings paterns to remove in input file name'
     log.info ''   
     log.info 'Flags'
     log.info ''
@@ -76,27 +78,30 @@ log.info "output_folder         = ${params.output_folder}"
 log.info "cpu                   = ${params.cpu}"
 log.info "mem                   = ${params.mem}"
 log.info "pass                  = ${params.pass}"
+log.info "tags                  = ${params.tags}"
 log.info ""
 
 /***************************************************************************************/
 /************************  Process   ***************************************************/
 /***************************************************************************************/
 
-process gama_annot {
+process annovar_annot {
 
   memory = params.mem+'.GB'
   cpus params.cpu
+
+  publishDir params.output_folder, mode: 'copy', pattern: '{*multianno*}'
 
   input:
     path vcf
 
   output:
-    tuple val(sample_tag), path("*tsv"), emit: annotated
+    tuple val(sample_tag), path("*avinput"), path("*multianno.txt"), path("*multianno.vcf"), emit: annotated
 
   shell:
     sample_tag = vcf.baseName.replaceFirst(/(.snvs|.indels).*/,"")
     """
-    annot.r -i ${vcf} -t ${params.cpu} -p "${params.pass}" \
+    annovar_annot.r -i ${vcf} -t ${params.cpu} -p "${params.pass}" -g "${params.tags}" \
             -l ${params.annovarDBlist} -a ${params.annovarDBpath} -b ${params.annovarBinPath}
     """
 
@@ -109,7 +114,7 @@ process gama_annot {
 }
 
 
-process gama_context {
+process gama_annot {
     
     publishDir params.output_folder, mode: 'copy'
 
@@ -117,14 +122,14 @@ process gama_context {
     cpus params.cpu
 
     input:
-      tuple val(sample_tag), path(tab)
+      tuple val(sample_tag), path(avinput), path(tab), path(vcf)
 
     output:
       tuple val(sample_tag), file("*1.tsv"), emit: context
 
     shell:
       """
-      getContext.r -a ${params.annovarDBpath}
+      gama_annot.r -a ${params.annovarDBpath}
       """
 
     stub:
@@ -132,8 +137,6 @@ process gama_context {
       touch ${sample_tag}.1.tsv
       """
 }
-
-
 
 /****************************************************************************************/
 /************************  Workflow   ***************************************************/
@@ -145,6 +148,6 @@ workflow {
     error "empty table folder, please verify your input." 
   }
 
-  gama_annot(allvcf) | gama_context
+  annovar_annot(allvcf) | gama_annot
 
 }
