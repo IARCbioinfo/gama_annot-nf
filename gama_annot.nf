@@ -94,6 +94,8 @@ process annovar_annot {
 
   input:
     path vcf
+    path annovar
+    path annovarDB
 
   output:
     tuple val(sample_tag), path("*avinput"), path("*multianno.txt"), path("*multianno.vcf"), emit: annotated
@@ -102,7 +104,7 @@ process annovar_annot {
     sample_tag = vcf.baseName.replaceFirst(/(.snvs|.indels).*/,"")
     """
     annovar_annot.r -i ${vcf} -t ${params.cpu} -p "${params.pass}" -g "${params.tags}" \
-            -l ${params.annovarDBlist} -a ${params.annovarDBpath} -b ${params.annovarBinPath}
+            -l ${params.annovarDBlist} -a ${annovarDB} -b ${annovar}
     """
 
   stub:
@@ -144,10 +146,13 @@ process gama_annot {
 
 workflow {
 
+  def annovar = Channel.fromPath( "${params.annovarBinPath}" )
+  def annovarDB = Channel.fromPath( "${params.annovarDBpath}" )
+
   allvcf = Channel.fromPath( "${params.input_folder}/*.{vcf,vcf.gz}" ).ifEmpty { 
     error "empty table folder, please verify your input." 
   }
 
-  annovar_annot(allvcf) | gama_annot
+  annovar_annot(allvcf,annovar,annovarDB) | gama_annot
 
 }
