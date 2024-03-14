@@ -125,13 +125,14 @@ process gama_annot {
 
     input:
       tuple val(sample_tag), path(avinput), path(tab), path(vcf)
+      path annovarDB
 
     output:
       tuple val(sample_tag), file("*1.tsv"), emit: context
 
     shell:
       """
-      gama_annot.r -a ${params.annovarDBpath}
+      gama_annot.r -a ${annovarDB}
       """
 
     stub:
@@ -153,6 +154,7 @@ workflow {
     error "empty table folder, please verify your input." 
   }
 
-  annovar_annot(allvcf,annovar,annovarDB) | gama_annot
+  annovar_annot(allvcf,annovar,annovarDB)
+  gama_annot(annovar_annot.out.annotated,annovarDB)
 
 }
