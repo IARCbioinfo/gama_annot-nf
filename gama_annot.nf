@@ -147,8 +147,8 @@ process gama_annot {
 
 workflow {
 
-  def annovar = Channel.fromPath( "${params.annovarBinPath}" )
-  def annovarDB = Channel.fromPath( "${params.annovarDBpath}" )
+  def annovar = file( params.annovarBinPath )
+  def annovarDB = file( params.annovarDBpath )
 
   allvcf = Channel.fromPath( "${params.input_folder}/*.{vcf,vcf.gz}" ).ifEmpty { 
     error "empty table folder, please verify your input." 
