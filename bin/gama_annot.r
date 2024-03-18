@@ -389,13 +389,13 @@ out <- gsub(".txt", ".1.tsv", multianno)
 print(paste0("Output file name : ", out))
 
 multianno <- multianno %>% read_tsv() %>%
-    order_variants() %>%
-    set_caller_name() %>%
-    dplyr::filter(ALT!=".") %>%
-    getStrand() %>%
-    getContextAnnotation() %>%
-    get_VAF() %>%
-    file_annot()
+multianno <- multianno %>% order_variants()
+multianno <- multianno %>% set_caller_name()
+multianno <- multianno %>% dplyr::filter(ALT!=".") 
+multianno <- multianno %>% getStrand()
+multianno <- multianno %>% getContextAnnotation()
+multianno <- multianno %>% get_VAF()
+multianno <- multianno %>% file_annot()
 
 print("Write output")
 write_tsv(multianno, file = out)
