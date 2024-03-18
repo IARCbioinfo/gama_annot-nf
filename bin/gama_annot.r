@@ -227,7 +227,7 @@ getVAF_Mutect <- function(vcf) {
     relocate("Cov_N", "Cov_T", "VAF_N", "VAF_T", "Cov_alt_T", "Cov_alt_N", .after = last_col())
 
   # Invert NORMAL and TUMOR when they are not in the correct order ( Cov_alt_T is suposed to be superior in TUMOR ! )
-  if (sum(vcf$Cov_alt_T) < sum(vcf$Cov_alt_N)) {
+  if (sum(vcf$Cov_alt_T, na.rm=TRUE) < sum(vcf$Cov_alt_N,na.rm=TRUE)) {
     vcf <- vcf %>%
       dplyr::rename(TUMOR = NORMAL, NORMAL = TUMOR, Cov_T = Cov_N, Cov_N = Cov_T, VAF_T = VAF_N, VAF_N = VAF_T, Cov_alt_T = Cov_alt_N, Cov_alt_N = Cov_alt_T) %>%
       relocate("Cov_N", "Cov_T", "VAF_N", "VAF_T", "Cov_alt_T", "Cov_alt_N", .after = last_col())
