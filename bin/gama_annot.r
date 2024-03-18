@@ -48,7 +48,7 @@ get_caller_name <- function(headers) {
       return(caller)
     }
   }
-  return("unknown")
+  return("Mutect2")
 }
 
 ##########################################
@@ -388,7 +388,7 @@ multianno<-list.files(path = "./", pattern="multianno.txt")[1]
 out <- gsub(".txt", ".1.tsv", multianno)
 print(paste0("Output file name : ", out))
 
-multianno <- multianno %>% read_tsv() %>%
+multianno <- multianno %>% read_tsv()
 multianno <- multianno %>% order_variants()
 multianno <- multianno %>% set_caller_name()
 multianno <- multianno %>% dplyr::filter(ALT!=".") 
