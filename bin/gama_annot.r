@@ -27,13 +27,13 @@ order_variants<-function(tab){
   print("order_variants")
   # order lines
   tab %>% mutate(num = Chr) %>%
-  mutate(num = ifelse(num == "chrX", "1023", num)) %>%
-  mutate(num = ifelse(num == "chrY", "1024", num)) %>%
-  mutate(num = ifelse(num == "chrM", "1025", num)) %>%
-  mutate(num = as.integer(gsub("chr", "", num))) %>%
-  arrange(num, Start, End, Ref, Alt) %>%
-  filter(!is.na(Chr), Chr != "NA") %>%
-  select(-num)
+    mutate(num = ifelse(num == "chrX", "1023", num)) %>%
+    mutate(num = ifelse(num == "chrY", "1024", num)) %>%
+    mutate(num = ifelse(num == "chrM", "1025", num)) %>%
+    mutate(num = as.integer(gsub("chr", "", num))) %>%
+    arrange(num, Start, End, Ref, Alt) %>%
+    filter(!is.na(Chr), Chr != "NA") %>%
+    select(-num)
 
 }
 
@@ -229,7 +229,7 @@ getVAF_Mutect <- function(vcf) {
   # Invert NORMAL and TUMOR when they are not in the correct order ( Cov_alt_T is suposed to be superior in TUMOR ! )
   if (sum(vcf$Cov_alt_T) < sum(vcf$Cov_alt_N)) {
     vcf <- vcf %>%
-      rename(TUMOR = NORMAL, NORMAL = TUMOR, Cov_T = Cov_N, Cov_N = Cov_T, VAF_T = VAF_N, VAF_N = VAF_T, Cov_alt_T = Cov_alt_N, Cov_alt_N = Cov_alt_T) %>%
+      dplyr::rename(TUMOR = NORMAL, NORMAL = TUMOR, Cov_T = Cov_N, Cov_N = Cov_T, VAF_T = VAF_N, VAF_N = VAF_T, Cov_alt_T = Cov_alt_N, Cov_alt_N = Cov_alt_T) %>%
       relocate("Cov_N", "Cov_T", "VAF_N", "VAF_T", "Cov_alt_T", "Cov_alt_N", .after = last_col())
   }
 
@@ -389,13 +389,13 @@ out <- gsub(".txt", ".1.tsv", multianno)
 print(paste0("Output file name : ", out))
 
 multianno <- multianno %>% read_tsv() %>%
-  order_variants() %>%
-  set_caller_name() %>%
-  dplyr::filter(ALT!=".") %>%
-  getStrand() %>%
-  getContextAnnotation() %>%
-  get_VAF() %>%
-  file_annot()
+    order_variants() %>%
+    set_caller_name() %>%
+    dplyr::filter(ALT!=".") %>%
+    getStrand() %>%
+    getContextAnnotation() %>%
+    get_VAF() %>%
+    file_annot()
 
 print("Write output")
 write_tsv(multianno, file = out)
