@@ -24,13 +24,13 @@ If the vcf files to annotate are from Strelka2 but were not generated using IARC
 
 ### Execution
 
- `nextflow run iarcbioinfo/gama_annot-nf -r master -latest -profile singularity --annovarDBlist Dblist.txt --annovarDBpath /data/annnovar/hg38db/ --annovarBinPath ~/bin/annovar/ --input vcf_folder/`
+ `nextflow run iarcbioinfo/gama_annot-nf -r master -latest -profile singularity --annovarDBlist Dblist.txt --annovarDBpath /data/annnovar/hg38db/ --annovarBinPath ~/bin/annovar/ --input_folder vcf_folder/`
 
 ### Options
 
 | OPTIONS | TYPE   | Description |
 |-------- | ------ | ----------- |
-| --input | FOLDER | Folder containing vcf to process |
+| --input_folder | FOLDER | Folder containing vcf to process |
 | --annovarDBlist  | FILE | File with two columns : protocols and operations (see example below) |
 | --annovarDBpath  | PATH | Path to annovarDB |
 | --annovarBinPath | PATH | Path to table_annovar.pl |
