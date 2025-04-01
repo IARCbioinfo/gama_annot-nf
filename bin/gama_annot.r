@@ -42,13 +42,13 @@ order_variants<-function(tab){
 get_caller_name <- function(headers) {
 
   print("get_caller_name")
-  callers=c("strelka", "Mutect2", "octopus", "needlestack")
+  callers=c("strelka", "Mutect2", "octopus", "needlestack","dupcaller")
   for (caller in callers) {
     if (any(grepl(caller, headers))) {
       return(caller)
     }
   }
-  return("Mutect2")
+  return("dupcaller") # dupcaller do not sign its vcf :-(
 }
 
 ##########################################
@@ -272,6 +272,25 @@ getVAF_Needlestack <- function(vcf) {
   return(vcf)
 }
 
+
+#getVAF_Dupcaller
+getVAF_Dupcaller <- function(vcf){
+  print("getVaf_Dupcaller")
+
+  Format <- (vcf %>% pull(FORMAT))[1]
+  stopifnot(assertthat::are_equal(Format, "GT:AC:RC:DP"))
+
+  vcf <- vcf %>%
+    extract(TUMOR, c("Cov_alt_T", "Cov_T"), "[^:]+:([^:]+):[^:]+:([^:]+)", remove = F) %>%
+    mutate(Cov_T = as.numeric(Cov_T), Cov_alt_T = as.numeric(Cov_alt_T), VAF_T = Cov_alt_T / Cov_T) %>%
+    extract(NORMAL, c("Cov_alt_N", "Cov_N"), "[^:]+:([^:]+):[^:]+:([^:]+)", remove = F) %>%
+    mutate(Cov_N = as.numeric(Cov_N), Cov_alt_N = as.numeric(Cov_alt_N), VAF_N = Cov_alt_N / Cov_N) %>%
+    relocate("Cov_N", "Cov_T", "VAF_N", "VAF_T", "Cov_alt_T", "Cov_alt_N", .after = last_col()) 
+
+  return(vcf)
+}
+
+
 # get_VAF
 get_VAF <- function(vcf) {
 
@@ -282,6 +301,7 @@ get_VAF <- function(vcf) {
     octopus = return(getVAF_Octopus(vcf)),
     needlestack = return(getVAF_Needlestack(vcf)),
     Mutect2 = return(getVAF_Mutect(vcf)),
+    dupcaller = return(getVAF_Dupcaller(vcf)),
     stop("Unknown caller")
   )
 }
